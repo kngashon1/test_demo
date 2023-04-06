@@ -14,7 +14,7 @@ pipeline {
     echo "Bitbucket CommitID = <GIT_COMMIT>".substring(0,7)
   }
 }
-
+*/
      stage('Docker Backup') {
   agent {
     label 'default'
@@ -27,7 +27,7 @@ pipeline {
       }
     }
   }
-}
+}/*
 
   	stage('Build and Test') {
 
@@ -55,6 +55,7 @@ pipeline {
   }
 }
 }
+*/
 stage('Prep Docker Env') {
   agent {
     label 'docker'
@@ -63,8 +64,8 @@ stage('Prep Docker Env') {
     echo 'DOCKER AGENT IS READY'
     echo 'Docker image will be deployed after SonarQube analysis is completed'
   }
-}
-
+}/*
+*/
 stage('Prep Database Env') {
   agent {
     label 'database'
@@ -108,7 +109,7 @@ stage('Update Database') {
       }
     }
   }
-}
+}/*
 stage('Docker Deploy to Dev') {
   agent {
     label 'docker'
