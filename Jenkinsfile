@@ -20,11 +20,6 @@ environment
 			REPORT_NAME = 'test' 
            }
 	
-        tools{
-	    maven 'Maven_Home'
-	    jdk 'OpenJDK11'
-	    nodejs 'NodeJS'
-    }
     stages {
 
         stage('Initialize') {
