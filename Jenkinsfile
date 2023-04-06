@@ -76,7 +76,7 @@ environment
 }
 }
 
-stage('Docker Deploy to Dev') {
+stage('Docker Deploy') {
   agent {
     label 'docker'
   }
