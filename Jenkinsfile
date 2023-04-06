@@ -76,27 +76,17 @@ environment
 }
 }
 
-stage('Deploy') {
+stage('Docker Deploy') {
   agent {
     label 'docker'
   }
-  steps {
-    dir('app') {
-      echo 'Building Docker Image'
-      script {
-        echo pwd()
-        echo 'Building docker from Secure Base Image'
-        echo 'Deploying to Fargate Test'
-        withAWS(credentials: 'AWS Fargate') {
-          buildDockerDeploy('demo-registry.com', 'demo-stage-repo', 'demo-stage-cluster', '1.0', '<GIT_COMMIT>'.substring(0,7))
-          if (env.SERVICE_TYPE != 'module') {
-            restartServiceInFargate('demo-stage-cluster', 'demo-stage-service')
-          } else {
-            echo 'Batch job or module was deployed. No need to restart service in Fargate.'
-          }
+   steps {
+              script{
+                        docker.withRegistry('https://720766170633.dkr.ecr.us-east-2.amazonaws.com', 'ecr:us-east-2:aws-credentials') {
+                    app.push("${env.BUILD_NUMBER}")
+                    app.push("latest")
+                    }
+                }
+            }
         }
-      }
     }
-  }
-}
-}
