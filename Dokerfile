@@ -1,4 +1,8 @@
-FROM nginx
-COPY index.tml /usr/share/nginx/html
-EXPOSE 8000
-CMD [nginx-debug, '-g', 'daemon off;']
+FROM maven:3.6.3-jdk-11 AS MAVEN_TOOL_CHAIN
+RUN rm -rf ./tmp
+COPY pom.xml ./tmp/
+COPY src ./tmp/src/
+COPY repo ./tmp/repo/
+WORKDIR ./tmp/
+RUN mvn -P test,stage clean package -Dmaven.test.skip=true 
+CMD ["java", "-jar", "/app/app.jar"]
