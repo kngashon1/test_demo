@@ -39,7 +39,7 @@ environment
     echo "Bitbucket CommitID = <GIT_COMMIT>".substring(0,7)
   }
 }
-
+/*
      stage('Docker Backup') {
   agent {
     label 'default'
@@ -52,7 +52,7 @@ environment
       }
     }
   }
-}
+}*/
 
   	stage('Build and Test') {
 
