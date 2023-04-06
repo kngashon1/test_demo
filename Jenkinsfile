@@ -18,9 +18,9 @@ environment
 			UPDATE_DATABASE = 'false'
 			SERVICE_TYPE = 'api'	
 			REPORT_NAME = 'test' 
-}
-
-{
+           }
+	
+        tools{
 	    maven 'Maven_Home'
 	    jdk 'OpenJDK11'
 	    nodejs 'NodeJS'
