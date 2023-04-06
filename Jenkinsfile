@@ -81,60 +81,6 @@ environment
 }
 }
 
-stage('Prep Docker Env') {
-  agent {
-    label 'docker'
-  }
-  steps {
-    echo 'DOCKER AGENT IS READY'
-    echo 'Docker image will be deployed after SonarQube analysis is completed'
-  }
-}
-
-stage('Prep Database Env') {
-  agent {
-    label 'database'
-  }
-  steps {
-    echo 'DATABASE AGENT IS READY'
-    echo 'Database image with psql will be deployed after SonarQube analysis is completed'
-  }
-}
-stage('Update Database') {
-  agent {
-    label 'database'
-  }
-  when {
-    allOf {
-      expression {
-        not {
-          "${SERVICE_TYPE}" == 'ui'
-        }
-      }
-      expression {
-        "${UPDATE_DATABASE}" == 'true'
-      }
-    }
-  }
-  steps {
-    dir('database') {
-      sh '''
-        for f in *.sql; do
-          echo "Running ${f}"
-          psql -h ${DATABASE_HOSTNAME} -p 5432 -d postgres -U postgresadmin -f "${f}"
-        done
-      '''
-      logParser failBuildOnError: true, projectRulePath: 'parsing_rules', showGraphs: true, useProjectRule: true, parsingRulesPath: ''
-      script {
-        if (currentBuild.currentResult == 'FAILURE') {
-          error 'Database update failed. See log for details.'
-        } else {
-          echo 'Database updated successfully'
-        }
-      }
-    }
-  }
-}
 stage('Docker Deploy to Dev') {
   agent {
     label 'docker'
