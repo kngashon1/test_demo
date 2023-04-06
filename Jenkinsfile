@@ -80,13 +80,41 @@ stage('Docker Deploy') {
   agent {
     label 'docker'
   }
-   steps {
-              script{
-                        docker.withRegistry('https://720766170633.dkr.ecr.us-east-2.amazonaws.com', 'ecr:us-east-2:aws-credentials') {
-                    app.push("${env.BUILD_NUMBER}")
-                    app.push("latest")
-                    }
-                }
+  steps {
+    dir('app') {
+      echo 'Building Docker Image'
+      script {
+        echo pwd()
+        echo 'Building docker from Secure Base Image'
+        if (env.CURRENT_BRANCH == 'master') {
+          echo 'Deploying to Fargate Master'
+          withAWS(credentials: 'AWS Fargate') {
+            buildDockerDeploy('example-registry.com', 'example-master-repo', 'example-master-cluster', '1.0', '<GIT_COMMIT>'.substring(0,7))
+            if (env.SERVICE_TYPE != 'module') {
+              restartServiceInFargate('example-master-cluster', 'example-master-service')
+            } else {
+              echo 'Batch job or module was deployed. No need to restart service in Fargate.'
             }
+          }
+        } else if (env.CURRENT_BRANCH == 'dev') {
+          echo 'Deploying to Fargate Test'
+          withAWS(credentials: 'AWS Fargate') {
+            buildDockerDeploy('example-registry.com', 'example-stage-repo', 'example-stage-cluster', '1.0', '<GIT_COMMIT>'.substring(0,7))
+            if (env.SERVICE_TYPE != 'module') {
+              restartServiceInFargate('example-stage-cluster', 'example-stage-service')
+            } else {
+              echo 'Batch job or module was deployed. No need to restart service in Fargate.'
+            }
+          }
+        } else {
+          withAWS(credentials: 'AWS Fargate') {
+            loginToAWS('example-registry.com')
+            buildDockerImage('example-registry.com', 'pullrequest', '1.0')
+          }
+          echo 'Branch is not Dev or Master branch. Skipping deployment.'
         }
+      }
     }
+  }
+}
+ }
